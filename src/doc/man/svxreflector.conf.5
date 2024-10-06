@@ -140,6 +140,13 @@ the risk of some client overwhelming the reflector with requests causing
 disturbances in the reflector operation.
 
 Example: HTTP_SRV_PORT=8080
+
+.TP
+.B AUTH_KEY
+Set a key used by nodes that are not configured in [USERS] section without
+defining an USER=password combination. This can be used for reflectors
+thatshould be open for everyone and/or a big number of clients to keep the configuration effort as low as possible.
+
 .TP
 .B COMMAND_PTY
 Configure a path for a pseudo tty device to send runtime commands to the
