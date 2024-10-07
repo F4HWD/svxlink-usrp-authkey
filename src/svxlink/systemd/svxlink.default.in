@@ -11,7 +11,7 @@ RUNASUSER=@SVXLINK_USER@
 CFGFILE=@SVX_SYSCONF_INSTALL_DIR@/svxlink.conf
 
 # Where to place the log file
-LOGFILE=@LOCAL_STATE_DIR@/log/svxlink
+LOGFILE=@LOCAL_STATE_DIR@/log/svxlink.log
 
 # Where to place the PID file
 PIDFILE=/run/svxlink.pid
