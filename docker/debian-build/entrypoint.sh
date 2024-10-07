@@ -19,7 +19,7 @@ fi
 
 # Set up the sudo command line
 SUDO_CMD="sudo -u svxlink "
-SUDO_CMD+="PATH=$PATH:/usr/lib64/qt4/bin "
+#SUDO_CMD+="PATH=$PATH:/usr/lib64/qt4/bin "
 SUDO_CMD+="GIT_URL=$GIT_URL "
 SUDO_CMD+="GIT_BRANCH=$GIT_BRANCH "
 SUDO_CMD+="NUM_CORES=$NUM_CORES "
