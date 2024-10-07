@@ -33,6 +33,9 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr \
       -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
       -DCPACK_GENERATOR=DEB \
       -DCMAKE_BUILD_TYPE=Release \
+      -DUSE_QT=OFF \
+      -DWITH_SYSTEMD=ON \
+      -DWITH_CONTRIB_USRP_LOGIC=ON \
       ../svxlink/src
 make -j$num_cores
 rm -f *.deb
