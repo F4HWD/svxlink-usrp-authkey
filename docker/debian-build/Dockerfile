@@ -51,9 +51,9 @@ MAINTAINER Tobias Blomberg <sm0svx@ssa.se>
 # Install required packages and set up the svxlink user
 RUN apt-get update && \
     apt-get -y install git cmake g++ make libsigc++-2.0-dev libgsm1-dev \
-                       libpopt-dev tcl8.6-dev libgcrypt20-dev libspeex-dev \
-                       libasound2-dev alsa-utils vorbis-tools qtbase5-dev \
-                       qttools5-dev qttools5-dev-tools libopus-dev \
+                       libpopt-dev tcl-dev libgcrypt20-dev libspeex-dev \
+                       libasound2-dev alsa-utils vorbis-tools doxygen \
+                       libopus-dev groff rtl-sdr libssl-dev \
                        librtlsdr-dev libjsoncpp-dev libcurl4-openssl-dev \
                        libgpiod-dev libogg-dev ladspa-sdk curl sudo
 #RUN apt-get -y install groff doxygen
@@ -76,9 +76,9 @@ RUN mkdir -p /usr/share/svxlink/sounds && \
 ADD sudoers-svxlink /etc/sudoers.d/svxlink
 RUN chmod 0440 /etc/sudoers.d/svxlink
 
-ARG GIT_URL_DEFAULT="https://github.com/sm0svx/svxlink.git"
+ARG GIT_URL_DEFAULT="https://github.com/F4HWD/svxlink-usrp-authkey.git"
 ARG GIT_SSL_NO_VERIFY_DEFAULT="false"
-ARG GIT_BRANCH_DEFAULT="master"
+ARG GIT_BRANCH_DEFAULT="svxlink-usrp"
 ARG NUM_CORES_DEFAULT="1"
 
 ENV GIT_URL=${GIT_URL_DEFAULT} \
