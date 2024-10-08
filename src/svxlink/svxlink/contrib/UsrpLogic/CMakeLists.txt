@@ -2,7 +2,12 @@ message(
   "--   The installing EXPERIMENTAL UsrpLogic extension"
 )
 
-add_manual_pages(UsrpLogic.conf.5)
+# Where to install SvxLink logic cores
+if(NOT DEFINED SVX_LOGIC_CORE_INSTALL_DIR)
+  set(SVX_LOGIC_CORE_INSTALL_DIR ${LIB_INSTALL_DIR}/svxlink)
+endif(NOT DEFINED SVX_LOGIC_CORE_INSTALL_DIR)
+
+#add_manual_pages(UsrpLogic.conf.5)
 
 # Build the plugin
 add_library(UsrpLogic MODULE UsrpLogic.cpp)
