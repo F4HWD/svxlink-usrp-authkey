@@ -17,11 +17,4 @@ install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/UsrpLogic.tcl
 )
 install_if_not_exists(${CMAKE_CURRENT_SOURCE_DIR}/dv_users.json
   ${SVX_SYSCONF_INSTALL_DIR}
-  )
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/UsrpLogic.conf.in
-  ${CMAKE_CURRENT_BINARY_DIR}/UsrpLogic.conf
-  @ONLY
-)
-install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/UsrpLogic.conf
-  ${SVX_SYSCONF_INSTALL_DIR}/svxlink.d
 )
