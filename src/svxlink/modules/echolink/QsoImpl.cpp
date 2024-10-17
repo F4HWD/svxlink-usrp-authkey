@@ -452,9 +452,9 @@ void QsoImpl::onInfoMsgReceived(const string& msg)
 {
   if (msg != last_info_msg)
   {
-    cout << "--- EchoLink info message received from " << remoteCallsign()
+   /* cout << "--- EchoLink info message received from " << remoteCallsign()
 	 << " ---" << endl
-	 << msg << endl;
+	 << msg << endl; */
     last_info_msg = msg;
     infoMsgReceived(this, msg);
   }  
@@ -476,9 +476,9 @@ void QsoImpl::onInfoMsgReceived(const string& msg)
  */
 void QsoImpl::onChatMsgReceived(const string& msg)
 {
-  cout << "--- EchoLink chat message received from " << remoteCallsign()
+  /* cout << "--- EchoLink chat message received from " << remoteCallsign()
        << " ---" << endl
-       << msg << endl;
+       << msg << endl; */
   chatMsgReceived(this, msg);
 } /* onChatMsgReceived */
 
