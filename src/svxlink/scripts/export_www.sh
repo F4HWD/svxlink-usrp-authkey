@@ -41,8 +41,6 @@ cd ../audio
 make expinc
 cd ../cpp
 make expinc
-cd ../qt
-make expinc
 cd ../../echolib
 make expinc
 cd ..

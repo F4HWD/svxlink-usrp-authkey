@@ -10,7 +10,6 @@
 #include <qprogressbar.h>
 #include <qlineedit.h>
 
-#include <AsyncQtApplication.h>
 #include <AsyncAudioIO.h>
 #include <AsyncTimer.h>
 #include <AsyncAudioSplitter.h>
@@ -192,7 +191,6 @@ int fq_to_k(int N, int fq)
 
 int main(int argc, char **argv)
 {
-  QtApplication app(argc, argv);
   
   const int basetone_N = 205;
   const int overtone_N = 201;

@@ -3,10 +3,6 @@
 %define RELEASE_DATE              080730
 %define RELEASE_NO                1
 
-# Version for the Qtel application
-%define QTEL                      0.11.1
-%define QTEL_RPM_RELEASE          1
-
 # Version for the EchoLib library
 %define ECHOLIB                   0.13.0
 %define ECHOLIB_RPM_RELEASE       2
@@ -162,32 +158,6 @@ fi
 %exclude %{_includedir}/svxlink/Tx.h
 %exclude %{_libdir}/libtrx.a
 
-
-
-%package -n qtel
-Summary: The QT EchoLink Client
-Version: %{QTEL}
-Release: %{QTEL_RPM_RELEASE}.%{dist}
-Group: Applications/Ham Radio
-Requires: libasync echolib hicolor-icon-theme
-
-%description -n qtel
-This package contains Qtel, the Qt EchoLink client. It is an implementation of
-the EchoLink software in Qt. This is only an EchoLink client, that is it can not
-be connected to a transciever to create a link. If it is a pure link node you
-want, install the svxlink-server package.
-
-%files -n qtel
-%defattr(644,root,root)
-%doc qtel/ChangeLog
-/usr/share/qtel/sounds/connect.raw
-/usr/share/qtel/translations/qtel_sv.qm
-%attr(755,root,root) %{_bindir}/qtel
-/usr/share/icons/hicolor/128x128/apps/qtel.png
-/usr/share/applications/qtel.desktop
-/usr/share/metainfo/org.svxlink.Qtel.metainfo.xml
-
-
 %package -n echolib
 Summary: EchoLink communications library
 Version: %{ECHOLIB}
@@ -246,7 +216,6 @@ The Async library files.
 %defattr(755,root,root)
 %{_libdir}/libasynccore-%{version}.so
 %{_libdir}/libasynccpp-%{version}.so
-%{_libdir}/libasyncqt-%{version}.so
 %{_libdir}/libasyncaudio-%{version}.so
 
 
@@ -270,7 +239,6 @@ The Async library development files
 %{_includedir}/svxlink/AsyncDnsLookup.h
 %{_includedir}/svxlink/AsyncFdWatch.h
 %{_includedir}/svxlink/AsyncIpAddress.h
-%{_includedir}/svxlink/AsyncQtApplication.h
 %{_includedir}/svxlink/AsyncTcpClient.h
 %{_includedir}/svxlink/AsyncTcpConnection.h
 %{_includedir}/svxlink/AsyncTcpServer.h
@@ -300,7 +268,6 @@ The Async library development files
 %{_includedir}/svxlink/SigCAudioSource.h
 %{_libdir}/libasynccore.a
 %{_libdir}/libasynccpp.a
-%{_libdir}/libasyncqt.a
 %{_libdir}/libasyncaudio.a
 
 %changelog
