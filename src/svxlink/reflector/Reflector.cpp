@@ -427,8 +427,8 @@ void Reflector::requestQsy(ReflectorClient *client, uint32_t tg)
 
 void Reflector::clientConnected(Async::FramedTcpConnection *con)
 {
-  cout << "Client " << con->remoteHost() << ":" << con->remotePort()
-       << " connected" << endl;
+  /* cout << "Client " << con->remoteHost() << ":" << con->remotePort()
+       << " connected" << endl; */
   m_client_con_map[con] = new ReflectorClient(this, con, m_cfg);
 } /* Reflector::clientConnected */
 
