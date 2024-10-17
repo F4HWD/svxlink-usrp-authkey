@@ -1381,21 +1381,21 @@ void ReflectorLogic::udpDatagramReceived(const IpAddress& addr, uint16_t port,
 
     // Check sequence number
   uint16_t udp_rx_seq_diff = header.sequenceNum() - m_next_udp_rx_seq;
-  if (udp_rx_seq_diff > 0x7fff) // Frame out of sequence (ignore)
+  /* if (udp_rx_seq_diff > 0x7fff) // Frame out of sequence (ignore)
   {
     cout << name()
          << ": Dropping out of sequence UDP frame with seq="
          << header.sequenceNum() << endl;
     return;
   }
-  else if (udp_rx_seq_diff > 0) // Frame lost
+   else if (udp_rx_seq_diff > 0) // Frame lost
   {
     cout << name() << ": UDP frame(s) lost. Expected seq="
          << m_next_udp_rx_seq
          << " but received " << header.sequenceNum()
          << ". Resetting next expected sequence number to "
          << (header.sequenceNum() + 1) << endl;
-  }
+  } */
   m_next_udp_rx_seq = header.sequenceNum() + 1;
 
   m_udp_heartbeat_rx_cnt = UDP_HEARTBEAT_RX_CNT_RESET;
