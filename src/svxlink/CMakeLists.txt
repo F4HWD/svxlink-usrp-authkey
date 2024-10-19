@@ -1,11 +1,5 @@
 include_directories(trx svxlink)
 
-option(WITH_SYSTEMD "Set to ON to include systemd support" OFF)
-message(STATUS "With Systemd = ${WITH_SYSTEMD}")
-if(WITH_SYSTEMD)
-  add_subdirectory(systemd)
-endif(WITH_SYSTEMD)
-
 add_subdirectory(digital)
 add_subdirectory(trx)
 add_subdirectory(svxlink)
@@ -16,3 +10,4 @@ add_subdirectory(reflector)
 add_subdirectory(siglevdetcal)
 add_subdirectory(devcal)
 add_subdirectory(contrib)
+add_subdirectory(systemd)
