@@ -1,3 +1,12 @@
+# Optional parts
+option(WITH_RI49 "Enable RI49 support" OFF)
+option(WITH_DMR_GW "Enable DMR Gateway Support via USRP" OFF)
+option(WITH_C4FM_GW "Enable C4FM Gateway Support via USRP" OFF)
+option(WITH_DSTAR_GW "Enable D-Star Gateway Support via USRP" OFF)
+option(WITH_ASL_GW "Enable AllStarLink Gateway Support via USRP" OFF)
+option(WITH_EL_GW "Enable EchoLink Gateway Support" OFF)
+
+
 # C++ source files needed to build SvxLink
 set(SVXLINK_SRCS
   svxlink.cpp MsgHandler.cpp Module.cpp Logic.cpp EventHandler.cpp
@@ -94,10 +103,53 @@ foreach(logic_name ${SVXLINK_LOGIC_CORES})
 endforeach()
 
 # Generate config file with correct paths
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink.conf.in
+if(WITH_RI49)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-49.conf.in
   ${CMAKE_CURRENT_BINARY_DIR}/svxlink.conf
   @ONLY
   )
+else()
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink.conf
+  @ONLY
+  )
+endif(WITH_RI49)
+
+if(WITH_DMR_GW)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-dmr.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink-dmr.conf
+  @ONLY
+  )
+endif(WITH_DMR_GW)
+
+if(WITH_C4FM_GW)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-c4fm.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink-c4fm.conf
+  @ONLY
+  )
+endif(WITH_C4FM_GW)
+
+if(WITH_DSTAR_GW)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-dstar.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink-dstar.conf
+  @ONLY
+  )
+endif(WITH_DSTAR_GW)
+
+if(WITH_ASL_GW)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-asl.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink-asl.conf
+  @ONLY
+  )
+endif(WITH_ASL_GW)
+
+if(WITH_EL_GW)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-el.conf.in
+  ${CMAKE_CURRENT_BINARY_DIR}/svxlink-el.conf
+  @ONLY
+  )
+endif(WITH_EL_GW)
+
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gpio.conf.in
   ${CMAKE_CURRENT_BINARY_DIR}/gpio.conf
   @ONLY
@@ -118,6 +170,37 @@ install_mkdir(${SVX_SHARE_INSTALL_DIR}/sounds)
 install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink.conf
   ${SVX_SYSCONF_INSTALL_DIR}
   )
+
+if(WITH_DMR_GW)
+  install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink-dmr.conf
+  ${SVX_SYSCONF_INSTALL_DIR}
+  )
+endif(WITH_DMR_GW)
+
+if(WITH_C4FM_GW)
+  install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink-c4fm.conf
+  ${SVX_SYSCONF_INSTALL_DIR}
+  )
+endif(WITH_C4FM_GW)
+
+if(WITH_DSTAR_GW)
+  install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink-dstar.conf
+  ${SVX_SYSCONF_INSTALL_DIR}
+  )
+endif(WITH_DSTAR_GW)
+
+if(WITH_ASL_GW)
+  install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink-asl.conf
+  ${SVX_SYSCONF_INSTALL_DIR}
+  )
+endif(WITH_ASL_GW)
+
+if(WITH_EL_GW)
+  install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/svxlink-el.conf
+  ${SVX_SYSCONF_INSTALL_DIR}
+  )
+endif(WITH_EL_GW)
+
 install_if_not_exists(${CMAKE_CURRENT_BINARY_DIR}/gpio.conf
   ${SVX_SYSCONF_INSTALL_DIR}
   )
