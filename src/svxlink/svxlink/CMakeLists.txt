@@ -104,7 +104,7 @@ endforeach()
 
 # Generate config file with correct paths
 if(WITH_RI49)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-49.conf.in
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/svxlink-ri49.conf.in
   ${CMAKE_CURRENT_BINARY_DIR}/svxlink.conf
   @ONLY
   )
