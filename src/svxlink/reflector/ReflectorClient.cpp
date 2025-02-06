@@ -1270,13 +1270,14 @@ void ReflectorClient::handleHeartbeat(Async::Timer *t)
 std::string ReflectorClient::lookupUserKey(const std::string& callsign)
 {
   string auth_group;
-  if (!m_cfg->getValue("USERS", callsign, auth_group) || auth_group.empty())
+  string auth_key;
+  if (!m_cfg->getValue("GLOBAL", "AUTH_KEY", auth_key) || auth_key.empty())
   {
-    cout << "*** WARNING: Unknown user \"" << callsign << "\""
-         << endl;
+    cout << "*** ERROR: AUTH_KEY not defined or empty." << endl;
     return "";
   }
-  string auth_key;
+    return auth_key;
+    
   if (!m_cfg->getValue("PASSWORDS", auth_group, auth_key) || auth_key.empty())
   {
     cout << "*** ERROR: User \"" << callsign << "\" found in SvxReflector "
