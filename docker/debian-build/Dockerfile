@@ -75,9 +75,9 @@ RUN mkdir -p /usr/share/svxlink/sounds && \
 ADD sudoers-svxlink /etc/sudoers.d/svxlink
 RUN chmod 0440 /etc/sudoers.d/svxlink
 
-ARG GIT_URL_DEFAULT="https://github.com/sm0svx/svxlink.git"
+ARG GIT_URL_DEFAULT="https://github.com/F4HWD/svxlink-usrp-authkey.git"
 ARG GIT_SSL_NO_VERIFY_DEFAULT="false"
-ARG GIT_BRANCH_DEFAULT="master"
+ARG GIT_BRANCH_DEFAULT="tetra-usrp"
 ARG NUM_CORES_DEFAULT="1"
 
 ENV GIT_URL=${GIT_URL_DEFAULT} \
