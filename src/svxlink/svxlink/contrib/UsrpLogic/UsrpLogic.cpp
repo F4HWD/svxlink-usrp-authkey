@@ -187,14 +187,14 @@ bool UsrpLogic::initialize(Async::Config& cfgobj, const std::string& logic_name)
     cout << "    USRP_HOST=" << m_usrp_host << endl;
   }
 
-  m_usrp_port = 41234;
+  //m_usrp_port = 41234;
   cfg().getValue(name(), "USRP_TX_PORT", m_usrp_port);
   if (debug > LOGERROR)
   {
     cout << "    USRP_TX_PORT=" << m_usrp_port << endl;
   }
 
-  m_usrp_rx_port = 41233;
+  //m_usrp_rx_port = 41233;
   cfg().getValue(name(), "USRP_RX_PORT", m_usrp_rx_port);
   if (debug > LOGERROR)
   {

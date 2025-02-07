@@ -1312,17 +1312,17 @@ void Reflector::udpDatagramReceived(const IpAddress& addr, uint16_t port,
     uint16_t udp_rx_seq_diff = header_v2.sequenceNum() - next_udp_rx_seq;
     if (udp_rx_seq_diff > 0x7fff) // Frame out of sequence (ignore)
     {
-      std::cout << client->callsign()
+      /* std::cout << client->callsign()
                 << ": Dropping out of sequence frame with seq="
                 << header_v2.sequenceNum() << ". Expected seq="
-                << next_udp_rx_seq << std::endl;
+                << next_udp_rx_seq << std::endl; */
       return;
     }
     else if (udp_rx_seq_diff > 0) // Frame(s) lost
     {
-      cout << client->callsign()
+      /* cout << client->callsign()
            << ": UDP frame(s) lost. Expected seq=" << next_udp_rx_seq
-           << ". Received seq=" << header_v2.sequenceNum() << endl;
+           << ". Received seq=" << header_v2.sequenceNum() << endl; */
     }
     client->setUdpRxSeq(header_v2.sequenceNum() + 1);
   }

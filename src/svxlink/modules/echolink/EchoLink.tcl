@@ -467,6 +467,12 @@ proc is_receiving {rx call} {
   variable CFG_LOCAL_RGR_SOUND
   if {[getVar CFG_LOCAL_RGR_SOUND 1] && !$rx} {
     playTone 1000 100 100
+  } 
+  if {$rx == 0} {
+    puts "EchoLink: Talker stop: $call"
+  }
+  if {$rx == 1} {
+    puts "EchoLink: Talker start: $call"
   }
 }
 

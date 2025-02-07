@@ -2158,18 +2158,18 @@ void ReflectorLogic::udpDatagramReceived(const IpAddress& addr, uint16_t port,
     // Check sequence number
   if (m_aad.iv_cntr < m_next_udp_rx_seq) // Frame out of sequence (ignore)
   {
-    std::cout << name()
+    /* std::cout << name()
               << ": Dropping out of sequence UDP frame with seq="
-              << m_aad.iv_cntr << std::endl;
+              << m_aad.iv_cntr << std::endl; */
     return;
   }
   else if (m_aad.iv_cntr > m_next_udp_rx_seq) // Frame lost
   {
-    std::cout << name() << ": UDP frame(s) lost. Expected seq="
+   /* std::cout << name() << ": UDP frame(s) lost. Expected seq="
               << m_next_udp_rx_seq
               << " but received " << m_aad.iv_cntr
               << ". Resetting next expected sequence number to "
-              << (m_aad.iv_cntr + 1) << std::endl;
+              << (m_aad.iv_cntr + 1) << std::endl; */
   }
   m_next_udp_rx_seq = m_aad.iv_cntr + 1;
 
