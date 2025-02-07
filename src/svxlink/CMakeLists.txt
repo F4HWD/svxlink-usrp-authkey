@@ -1,3 +1,4 @@
+include_directories(trx svxlink)
 add_subdirectory(digital)
 add_subdirectory(trx)
 add_subdirectory(svxlink)
