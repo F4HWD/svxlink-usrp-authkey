@@ -14,4 +14,4 @@ STATEDIR=@SVX_LOCAL_STATE_DIR@
 CFGFILE=@SVX_SYSCONF_INSTALL_DIR@/svxreflector.conf
 
 # Where to place the log file
-LOGFILE=@LOCAL_STATE_DIR@/log/svxreflector
+LOGFILE=@LOCAL_STATE_DIR@/log/svxreflector.log
