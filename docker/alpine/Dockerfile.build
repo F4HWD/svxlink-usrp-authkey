@@ -46,7 +46,7 @@ RUN git clone --branch ${GIT_REF} ${GIT_REPO}
 RUN mkdir build
 WORKDIR ${HOME}/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_SYSCONFDIR=/etc \
-          -DCMAKE_INSTALL_LOCALSTATEDIR=/var -DUSE_QT=OFF \
+          -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
           -DLIB_INSTALL_DIR=/lib -DDO_INSTALL_CHOWN=YES \
           -DRTLSDR_DIR=${RTLSDR_WORKDIR} -DDO_INSTALL_CHOWN=YES \
           ../svxlink/src

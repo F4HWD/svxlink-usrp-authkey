@@ -43,8 +43,6 @@ example will create a pure C++ application.
 If you want to write a Qt application you should use AsyncQtApplication
 instead of AsyncCppApplication.
 
-@include AsyncQtApplication_demo.cpp
-
 The above examples does not do much. Especially the Cpp variant do nothing. Have
 a look att the other async classes to understand how to build a working
 application.

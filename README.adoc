@@ -29,10 +29,6 @@ either C++ or TCL. Examples of modules are:
 * *Frn*                -- Connect to Free Radio Network (FRN) servers
 * *Trx*                -- Remote control tranceivers using DTMF
 
-== Qtel ==
-Qtel, the Qt EchoLink client, is a graphical application used to access the
-EchoLink network.
-
 == Resources ==
 These are some of the resources connected to SvxLink:
 

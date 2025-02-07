@@ -74,7 +74,7 @@ cd svxlink/src
 git checkout tetra-contrib
 mkdir build
 cd build
-cmake -DUSE_QT=OFF -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DWITH_SYSTEMD=ON -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DWITH_SYSTEMD=ON -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON ..
 make
 # on weak systems make should be used with the "-j4 -l2" options: make -j4 -l2
 # tnx to Daniel/SP0DZ
@@ -103,7 +103,7 @@ cd svxlink/src
 git checkout tetra-contrib
 mkdir build
 cd build
-cmake -DUSE_QT=OFF -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DWITH_SYSTEMD=ON -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON -DWITH_CONTRIB_SIP_LOGIC=ON  ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DWITH_SYSTEMD=ON -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON -DWITH_CONTRIB_SIP_LOGIC=ON  ..
 make
 # on weak systems make should be used with the "-j4 -l2" options: make -j4 -l2
 # tnx to Daniel/SP0DZ
@@ -117,7 +117,7 @@ systemctl stop svxlink
 cd /home/svxlink/svxlink/src/build/
 make clean
 git pull
-cmake -DUSE_QT=OFF -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON ..
 sudo make install
 sudo systemctl start svxlink
 ```
@@ -129,7 +129,7 @@ systemctl stop svxlink
 cd /home/svxlink/svxlink/src/build/
 make clean
 git pull
-cmake -DUSE_QT=OFF -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON -DWITH_CONTRIB_SIP_LOGIC=ON -DWITH_SYSTEMD=ON ..
+cmake -DCMAKE_INSTALL_PREFIX=/usr -DSYSCONF_INSTALL_DIR=/etc -DLOCAL_STATE_DIR=/var -DCMAKE_BUILD_TYPE=Release -DWITH_CONTRIB_TETRA_LOGIC=ON -DWITH_CONTRIB_SIP_LOGIC=ON -DWITH_SYSTEMD=ON ..
 sudo make install
 sudo systemctl start svxlink
 ```

@@ -43,7 +43,6 @@ set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 # Optional parts
-option(USE_QT "Build Qt applications and libs" ON)
 option(BUILD_STATIC_LIBS "Build static libraries in addition to dynamic" OFF)
 
 # The sample rate used internally in SvxLink
@@ -336,9 +335,6 @@ add_subdirectory(misc)
 add_subdirectory(echolib)
 add_subdirectory(locationinfo)
 add_subdirectory(svxlink)
-if(USE_QT)
-  add_subdirectory(qtel)
-endif(USE_QT)
 
 # Experimental CPack package building
 set(CPACK_SET_DESTDIR "ON")
