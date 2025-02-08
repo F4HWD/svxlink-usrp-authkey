@@ -134,7 +134,7 @@ using namespace SvxLink;
 
 #define MAX_TRIES 5
 
-#define TETRA_LOGIC_VERSION "29012025"
+#define TETRA_LOGIC_VERSION "08022025"
 
 /****************************************************************************
  *
@@ -1850,7 +1850,10 @@ void TetraLogic::handleCallReleased(std::string message)
 
   inTransmission = false;
 
-  registerUser(Qso.tsi); // updateuserinfo for registration at reflector
+  if (Qso.tsi != "")
+  {
+    registerUser(Qso.tsi); // updateuserinfo for registration at reflector
+  }
 
   checkSds(); // resend Sds after MS got into Rx mode
 
@@ -2241,7 +2244,8 @@ void TetraLogic::onPublishStateEvent(const string &event_name, const string &msg
   }
   else if (event_name == "ForwardSds:info")
   {
-    Json::Value t_msg = user_arr[0];
+    Json::Value t_msg;
+    (user_arr.isArray() ? t_msg = user_arr[0] : t_msg = user_arr);
     std::string destcall = t_msg.get("dest_call", "").asString();
     std::string msg = t_msg.get("sds_info", "").asString();
     std::string source = t_msg.get("source", "").asString();
