@@ -1,12 +1,12 @@
 /**
 @file   AsyncSslExtX509SubjectAltName.h
-@brief  A_brief_description_for_this_file
+@brief  Represent the X.509 Subject Alternative Name extension
 @author Tobias Blomberg / SM0SVX
 @date   2022-05-27
 
 \verbatim
-<A brief description of the program or library this file belongs to>
-Copyright (C) 2003-2022 Tobias Blomberg / SM0SVX
+Async - A library for programming event driven applications
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 \endverbatim
 */
 
-/** @example AsyncSslExtX509SubjectAltName_demo.cpp
+/** @example AsyncSslX509_demo.cpp
 An example of how to use the SslX509ExtSubjectAltName class
 */
 
@@ -38,6 +38,7 @@ An example of how to use the SslX509ExtSubjectAltName class
  *
  ****************************************************************************/
 
+#include <functional>
 
 
 /****************************************************************************
@@ -105,22 +106,29 @@ namespace Async
  ****************************************************************************/
 
 /**
-@brief  A_brief_class_description
+@brief  A class representing the X.509 Subject Alternative Name extension
 @author Tobias Blomberg / SM0SVX
 @date   2022-05-27
 
-A_detailed_class_description
-
-\include AsyncSslExtX509SubjectAltName_demo.cpp
+\include AsyncSslX509_demo.cpp
 */
 class SslX509ExtSubjectAltName
 {
   public:
+    using ForeachFunction = std::function<void(int, std::string)>;
+
     /**
      * @brief   Default constructor
      */
     //SslX509ExtSubjectAltName(void);
 
+    /**
+     * @brief   Constructor
+     * @param   names A string of comma separated names
+     *
+     * Names are specified on a tag:value format. For example:
+     * DNS:example.org, IP:1.2.3.4, email:user@example.org
+     */
     explicit SslX509ExtSubjectAltName(const std::string& names)
     {
       m_ext = X509V3_EXT_conf_nid(NULL, NULL, NID_subject_alt_name,
@@ -129,7 +137,7 @@ class SslX509ExtSubjectAltName
 
     /**
      * @brief   Constructor
-     * @param   names An existing X509_EXTENSION object
+     * @param   ext An existing X509_EXTENSION object
      */
     SslX509ExtSubjectAltName(const X509_EXTENSION* ext)
     {
@@ -142,7 +150,7 @@ class SslX509ExtSubjectAltName
 
     /**
      * @brief   Constructor
-     * @param   names An existing GENERAL_NAMES object
+     * @param   names A pointer to an existing GENERAL_NAMES object
      */
     explicit SslX509ExtSubjectAltName(GENERAL_NAMES* names)
     {
@@ -184,9 +192,8 @@ class SslX509ExtSubjectAltName
     }
 
     /**
-     * @brief   A_brief_member_function_description
-     * @param   param1 Description_of_param1
-     * @return  Return_value_of_this_member_function
+     * @brief   Check if the object is initialized
+     * @return  Returns \em true if the object is null
      */
     bool isNull(void) const { return m_ext == nullptr; }
 
@@ -207,104 +214,159 @@ class SslX509ExtSubjectAltName
     }
 #endif
 
+    /**
+     * @brief   Cast to X509_EXTENSION pointer
+     * @returns Return a pointer to a X509_EXTENSION, or null if uninitialized
+     */
     operator const X509_EXTENSION*() const { return m_ext; }
 
-    std::string toString(void) const
+    /**
+     * @brief   Loop through all names calling the given function for each one
+     * @param   f     The function to call for each name
+     * @param   type  The name type to call the function for (default: all)
+     *
+     * Type can be GEN_DNS, GEN_IPADD or GEN_EMAIL. Other types are ignored.
+     */
+    void forEach(ForeachFunction f, int type=-1) const
     {
-      std::string str;
-      auto names = reinterpret_cast<GENERAL_NAMES*>(X509V3_EXT_d2i(m_ext));
-      do
+      if (m_ext == nullptr)
       {
-        if (m_ext == nullptr)
+        return;
+      }
+
+      const auto names = reinterpret_cast<GENERAL_NAMES*>(X509V3_EXT_d2i(m_ext));
+      const int count = sk_GENERAL_NAME_num(names);
+      for (int i = 0; i < count; ++i)
+      {
+        const GENERAL_NAME* entry = sk_GENERAL_NAME_value(names, i);
+        if ((entry == nullptr) || ((type >= 0) && (entry->type != type)))
         {
-          break;
+          continue;
         }
 
-        int count = sk_GENERAL_NAME_num(names);
-        if (count == 0)
+        std::string name;
+        switch (entry->type)
         {
-          break;
-        }
+          case GEN_OTHERNAME:
+            break;
 
-        std::string sep;
-        for (int i = 0; i < count; ++i)
-        {
-          GENERAL_NAME* entry = sk_GENERAL_NAME_value(names, i);
-          if (entry == nullptr)
-          {
-            continue;
-          }
+          case GEN_EMAIL:
+            name = asn1StringToUtf8(entry->d.rfc822Name);
+            break;
 
-          if (entry->type == GEN_DNS)
-          {
-            unsigned char* utf8 = nullptr;
-            int len = ASN1_STRING_to_UTF8(&utf8, entry->d.dNSName);
-            if ((utf8 == nullptr) || (len < 1))
-            {
-              break;
-            }
-            std::string name(utf8, utf8+len);
-            OPENSSL_free(utf8);
-            if (name.empty())
-            {
-              break;
-            }
-            str += sep + "DNS:" + name;
-          }
-          else if (entry->type == GEN_EMAIL)
-          {
-            unsigned char* utf8 = nullptr;
-            int len = ASN1_STRING_to_UTF8(&utf8, entry->d.rfc822Name);
-            if ((utf8 == nullptr) || (len < 1))
-            {
-              break;
-            }
-            std::string name(utf8, utf8+len);
-            OPENSSL_free(utf8);
-            if (name.empty())
-            {
-              break;
-            }
-            str += sep + "email:" + name;
-          }
-          else if (entry->type == GEN_IPADD)
+          case GEN_DNS:
+            name = asn1StringToUtf8(entry->d.dNSName);
+            break;
+
+          case GEN_X400:
+          case GEN_DIRNAME:
+          case GEN_EDIPARTY:
+          case GEN_URI:
+            break;
+
+          case GEN_IPADD:
           {
             int len = ASN1_STRING_length(entry->d.iPAddress);
             if (len == 4)
             {
               const unsigned char* data =
                 ASN1_STRING_get0_data(entry->d.iPAddress);
-              struct in_addr in_addr;
+              struct in_addr in_addr = {0};
               in_addr.s_addr = *reinterpret_cast<const unsigned long*>(data);
               Async::IpAddress addr(in_addr);
-              str += sep + "IP Address:" + addr.toString();
+              name = addr.toString();
             }
             else if (len == 16)
             {
-                // FIXME: IPv6
-              continue;
+              // FIXME: IPv6
             }
-            else
-            {
-              break;
-            }
-          }
-          else
-          {
-            continue;
+            break;
           }
 
-          sep = ", ";
+          case GEN_RID:
+            break;
+
+          default:
+            // Ignore unknown SAN type
+            break;
         }
-      } while (false);
-
+        if (!name.empty())
+        {
+          f(entry->type, name);
+        }
+      }
       GENERAL_NAMES_free(names);
+    } /* forEach */
 
+    /**
+     * @brief   Convert all SANs to a string
+     * @param   type  The name type consider (default: all)
+     * @returns Return a ", " separated string with SANs
+     *
+     * Type can be GEN_DNS, GEN_IPADD or GEN_EMAIL.
+     */
+    std::string toString(int type=-1) const
+    {
+      std::string sep;
+      std::string str;
+      forEach(
+          [&](int type, std::string name)
+          {
+            switch (type)
+            {
+              case GEN_OTHERNAME:
+                break;
+
+              case GEN_EMAIL:
+                str += sep + "email:" + name;
+                break;
+
+              case GEN_DNS:
+                str += sep + "DNS:" + name;
+                break;
+
+              case GEN_X400:
+              case GEN_DIRNAME:
+              case GEN_EDIPARTY:
+              case GEN_URI:
+                break;
+
+              case GEN_IPADD:
+                str += sep + "IP Address:" + name;
+                break;
+
+              case GEN_RID:
+                break;
+
+              default:
+                // Ignore unknown SAN type
+                break;
+            }
+            sep = ", ";
+          },
+          type);
       return str;
-    }
+    } /* toString */
 
   private:
     X509_EXTENSION* m_ext = nullptr;
+
+    std::string asn1StringToUtf8(ASN1_IA5STRING* asn1str) const
+    {
+      std::string str;
+      if (asn1str == nullptr)
+      {
+        return str;
+      }
+      unsigned char* utf8 = nullptr;
+      const int len = ASN1_STRING_to_UTF8(&utf8, asn1str);
+      if ((utf8 != nullptr) && (len > 0))
+      {
+        str.assign(utf8, utf8+len);
+      }
+      OPENSSL_free(utf8);
+      return str;
+    }
 
 };  /* class SslX509ExtSubjectAltName */
 

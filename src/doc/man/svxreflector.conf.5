@@ -1,4 +1,4 @@
-.TH SVXREFLECTOR.CONF 5 "SEPTEMBER 2024" Linux "File Formats"
+.TH SVXREFLECTOR.CONF 5 "MAY 2025" Linux "File Formats"
 .
 .SH NAME
 .
@@ -174,6 +174,15 @@ some specific callsigns or even a whole range of callsigns. No callsigns are
 rejected by default.
 Example: REJECT_CALLSIGN="SM0XYZ|SM1ABC|SM2.*"
 .TP
+.B ACCEPT_CERT_EMAIL
+A regular expression for verifying that email addresses in a received
+certificate signing requests are valid. If unset, which is the default, all
+email addresses are accepted. If an invalid email address is received from a
+node it will be disconnected and an error message will be sent to the node. The
+following example should accept most email addresses at the same time as
+detecting most invalid ones.
+Example: ACCEPT_CERT_EMAIL=""\\w+(?:[-._+]\\w+)*@\\w+(?:\\.\\w+)*"
+.TP
 .B CERT_PKI_DIR
 The path to the directory containing PKI (Public Key Infrastructure) files. If
 a relative path is given, the value of the build time variable
@@ -281,11 +290,12 @@ Example: EMAIL_ADDRESS=sysop@svxlink.example.org
 .
 .SS USERS and PASSWORDS sections
 .
-All users must be specified in the USERS section. Usernames are totally
-arbitrary but typically the callsign is used. The purpose is to map each
-username to a password. However, the password is not given directly but instead
-a reference to the PASSWORDS section is given. It's done like this so that
-multiple nodes can share a single password.
+Previously, all users had to be specified in the USERS section. That is not
+needed anymore for nodes that use a SvxLink version > 1.8.0. Usernames are
+totally arbitrary but typically the callsign is used. The purpose is to map
+each username to a password. However, the password is not given directly but
+instead a reference to the PASSWORDS section is given. It's done like this so
+that multiple nodes can share a single password.
 .P
 An example of how the USERS and PASSWORDS sections may look is given below.
 

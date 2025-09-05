@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Force new UID if specified
 #if [ -n "$SVXLINK_UID" ]; then
@@ -13,12 +13,13 @@
 
 # Create the hostaudio group if GID is specified
 if [ -n "$HOSTAUDIO_GID" ]; then
-  sudo groupadd -g $HOSTAUDIO_GID hostaudio
-  sudo usermod -G $HOSTAUDIO_GID svxlink
+  groupadd -g $HOSTAUDIO_GID hostaudio
+  usermod -G $HOSTAUDIO_GID svxlink
 fi
 
 # Set up the sudo command line
 SUDO_CMD="sudo -u svxlink "
+SUDO_CMD+="PATH=$PATH:/usr/lib64/qt4/bin "
 SUDO_CMD+="GIT_URL=$GIT_URL "
 SUDO_CMD+="GIT_BRANCH=$GIT_BRANCH "
 SUDO_CMD+="NUM_CORES=$NUM_CORES "

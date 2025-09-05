@@ -6,7 +6,7 @@
 
 \verbatim
 SvxReflector - An audio reflector for connecting SvxLink Servers
-Copyright (C) 2003-2023 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -257,15 +257,16 @@ ReflectorClient::~ReflectorClient(void)
 } /* ReflectorClient::~ReflectorClient */
 
 
-void ReflectorClient::setRemoteUdpPort(uint16_t port)
+void ReflectorClient::setRemoteUdpSource(const ReflectorClient::ClientSrc& src)
 {
   assert(m_remote_udp_port == 0);
-  m_remote_udp_port = port;
+  m_remote_udp_port = src.second;
   if (m_client_proto_ver >= ProtoVer(3, 0))
   {
-    m_client_src = newClientSrc(this);
+    m_client_src = src;
+    client_src_map[src] = this;
   }
-} /* ReflectorClient::setRemoteUdpPort */
+} /* ReflectorClient::setRemoteUdpSource */
 
 
 int ReflectorClient::sendMsg(const ReflectorMsg& msg)
@@ -392,15 +393,6 @@ ReflectorClient::ClientId ReflectorClient::newClientId(ReflectorClient* client)
 } /* ReflectorClient::newClientId */
 
 
-ReflectorClient::ClientSrc ReflectorClient::newClientSrc(ReflectorClient* client)
-{
-  ClientSrc src{std::make_pair(client->m_con->remoteHost(),
-                               client->m_remote_udp_port)};
-  client_src_map[src] = client;
-  return src;
-} /* ReflectorClient::newClientSrc */
-
-
 void ReflectorClient::onSslConnectionReady(TcpConnection *con)
 {
   //std::cout << "### ReflectorClient::onSslConnectionReady" << std::endl;
@@ -453,9 +445,17 @@ void ReflectorClient::onSslConnectionReady(TcpConnection *con)
     return;
   }
 
+    // Set cert renewal timer to expire one minute after the actual renewal
+    // time to avoid a race condition. Also delay renewal to at least 10
+    // minutes after node connection to reduce problems with renewal loops.
+    // Renewal loops may occur if the client does not accept a new certificate
+    // for some reason and upon reconnection continue to use the old
+    // certificate, in which case the reflector will send the new cert again,
+    // and so on. This may happen if the real-time clock is not correctly set
+    // on the node.
   time_t renew_time = std::max(
-      std::time(NULL) + 600,
-      Reflector::timeToRenewCert(peer_cert));
+      std::time(NULL) + 10*60,
+      Reflector::timeToRenewCert(peer_cert) + 60);
   m_renew_cert_timer.setTimeout(renew_time);
   m_renew_cert_timer.start();
 
@@ -794,6 +794,13 @@ void ReflectorClient::handleMsgClientCsr(std::istream& is)
     return;
   }
   req.print(idss.str() + ":   ");
+  auto errstr = m_reflector->checkCsr(req);
+  if (!errstr.empty())
+  {
+    std::cerr << "*** ERROR[" << idss.str() << "]: " << errstr << std::endl;
+    sendError(errstr);
+    return;
+  }
 
   auto cert = m_reflector->csrReceived(req);
   auto current_req = m_reflector->loadClientCsr(req.commonName());
@@ -905,7 +912,7 @@ void ReflectorClient::handleNodeInfo(std::istream& is)
     }
     //std::cout << "### handleNodeInfo: udpSrcPort()=" << msg.udpSrcPort()
     //          << " JSON=" << msg.json() << std::endl;
-    //setRemoteUdpPort(msg.udpSrcPort());
+    //setRemoteUdpSource(msg.udpSrcPort());
     setUdpCipherIVRand(msg.ivRand());
     setUdpCipherKey(msg.udpCipherKey());
     jsonstr = msg.json();
@@ -1385,19 +1392,19 @@ void ReflectorClient::sendAuthChallenge(void)
          MsgAuthChallenge::LENGTH);
   sendMsg(challenge_msg);
   m_con_state = STATE_EXPECT_AUTH_RESPONSE;
-}
+} /* ReflectorClient::sendAuthChallenge */
 
 
 void ReflectorClient::renewClientCertificate(void)
 {
-  std::cout << m_callsign << ": Renew client certificate" << std::endl;
   auto cert = m_con->sslPeerCertificate();
-  if (cert.isNull() || !m_reflector->signClientCert(cert, "CRT_RENEWED"))
+  if (cert.isNull() || !m_reflector->renewedClientCert(cert))
   {
-    std::cerr << "*** WARNING: Certificate resigning for '"
+    std::cerr << "*** WARNING: Certificate renewal for '"
               << m_callsign << "' failed" << std::endl;
     return;
   }
+  std::cout << m_callsign << ": Send renewed client certificate" << std::endl;
   sendClientCert(cert);
   m_con_state = STATE_EXPECT_DISCONNECT;
 } /* ReflectorClient::renewClientCertificate */

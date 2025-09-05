@@ -6,7 +6,7 @@
 
 \verbatim
 SvxLink - A Multi Purpose Voice Services System for Ham Radio Use
-Copyright (C) 2003-2024 Tobias Blomberg / SM0SVX
+Copyright (C) 2003-2025 Tobias Blomberg / SM0SVX
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -31,8 +31,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  ****************************************************************************/
 
 #include <unistd.h>
-//#include <openssl/x509.h>
-//#include <openssl/x509v3.h>
+#include <sys/utsname.h>
 
 #include <sstream>
 #include <iostream>
@@ -108,31 +107,6 @@ using namespace Async;
  ****************************************************************************/
 
 namespace {
-  //void splitFilename(const std::string& filename, std::string& dirname,
-  //    std::string& basename)
-  //{
-  //  std::string ext;
-  //  basename = filename;
-
-  //  size_t basenamepos = filename.find_last_of('/');
-  //  if (basenamepos != string::npos)
-  //  {
-  //    if (basenamepos + 1 < filename.size())
-  //    {
-  //      basename = filename.substr(basenamepos + 1);
-  //    }
-  //    dirname = filename.substr(0, basenamepos + 1);
-  //  }
-
-  //  size_t extpos = basename.find_last_of('.');
-  //  if (extpos != string::npos)
-  //  {
-  //    if (extpos+1 < basename.size())
-  //    ext = basename.substr(extpos+1);
-  //    basename.erase(extpos);
-  //  }
-  //}
-
   template <class T>
   void hexdump(const T& d)
   {
@@ -251,8 +225,8 @@ bool ReflectorLogic::initialize(Async::Config& cfgobj, const std::string& logic_
 {
     // Must create logic connection objects before calling LogicBase::initialize
   m_logic_con_in = new Async::AudioStreamStateDetector;
-  m_logic_con_in->sigStreamStateChanged.connect(
-      sigc::mem_fun(*this, &ReflectorLogic::onLogicConInStreamStateChanged));
+  m_logic_con_in->sigStreamIsIdle.connect(
+      sigc::mem_fun(*this, &ReflectorLogic::onLogicConInStreamIsIdle));
   m_logic_con_out = new Async::AudioStreamStateDetector;
   m_logic_con_out->sigStreamStateChanged.connect(
       sigc::mem_fun(*this, &ReflectorLogic::onLogicConOutStreamStateChanged));
@@ -454,7 +428,7 @@ bool ReflectorLogic::initialize(Async::Config& cfgobj, const std::string& logic_
   if (!loadClientCertificate())
   {
     std::cerr << "*** WARNING[" << name() << "]: Failed to load client "
-                 "certificate. Ifnoring on-disk stored certificate file '"
+                 "certificate. Ignoring on-disk stored certificate file '"
               << m_crtfile << "'." << std::endl;
   }
 
@@ -660,6 +634,12 @@ bool ReflectorLogic::initialize(Async::Config& cfgobj, const std::string& logic_
   m_node_info["sw"] = "SvxLink";
   m_node_info["swVer"] = SVXLINK_APP_VERSION;
   m_node_info["projVer"] = PROJECT_VERSION;
+
+  struct utsname osInfo{};
+  if (uname(&osInfo) == 0)
+  {
+    m_node_info["machineArch"] = osInfo.machine;
+  }
 
   cfg().getValue(name(), "UDP_HEARTBEAT_INTERVAL",
       m_udp_heartbeat_tx_cnt_reset);
@@ -1016,7 +996,7 @@ void ReflectorLogic::onConnected(void)
   //m_con.setMaxFrameSize(ReflectorMsg::MAX_SSL_SETUP_FRAME_SIZE);
   m_con_state = STATE_EXPECT_CA_INFO;
   //m_con.setMaxFrameSize(ReflectorMsg::MAX_PREAUTH_FRAME_FRAME_SIZE);
-  processEvent("reflector_connection_status_update 1");
+  //processEvent("reflector_connection_status_update 1");
 } /* ReflectorLogic::onConnected */
 
 
@@ -1230,12 +1210,13 @@ void ReflectorLogic::handleMsgError(std::istream& is)
   MsgError msg;
   if (!msg.unpack(is))
   {
-    cerr << "*** ERROR[" << name() << "]: Could not unpack MsgAuthError" << endl;
+    std::cerr << "*** ERROR[" << name() << "]: Could not unpack MsgAuthError"
+              << std::endl;
     disconnect();
     return;
   }
-  cout << name() << ": Error message received from server: " << msg.message()
-       << endl;
+  std::cerr << "*** ERROR[" << name() << "]: Server error: " << msg.message()
+       << std::endl;
   disconnect();
 } /* ReflectorLogic::handleMsgError */
 
@@ -2182,6 +2163,7 @@ void ReflectorLogic::udpDatagramReceived(const IpAddress& addr, uint16_t port,
               << std::endl;
     m_con.markAsEstablished();
     m_con_state = STATE_CONNECTED;
+    processEvent("reflector_connection_status_update 1");
 
     if (m_selected_tg > 0)
     {
@@ -2473,11 +2455,10 @@ bool ReflectorLogic::codecIsAvailable(const std::string &codec_name)
 } /* ReflectorLogic::codecIsAvailable */
 
 
-void ReflectorLogic::onLogicConInStreamStateChanged(bool is_active,
-                                                    bool is_idle)
+void ReflectorLogic::onLogicConInStreamIsIdle(bool is_idle)
 {
-  //cout << "### ReflectorLogic::onLogicConInStreamStateChanged: is_active="
-  //     << is_active << "  is_idle=" << is_idle << endl;
+  //std::cout << "### ReflectorLogic::onLogicConInStreamIsIdle: "
+  //          << "is_idle=" << is_idle << std::endl;
   if (is_idle)
   {
     if (m_qsy_pending_timer.isEnabled())
@@ -2519,7 +2500,11 @@ void ReflectorLogic::onLogicConInStreamStateChanged(bool is_active,
   }
 
   checkIdle();
-} /* ReflectorLogic::onLogicConInStreamStateChanged */
+
+  std::ostringstream ss;
+  ss << "local_talker_" << (is_idle ? "stop" : "start");
+  processEvent(ss.str());
+} /* ReflectorLogic::onLogicConInStreamIsIdle */
 
 
 void ReflectorLogic::onLogicConOutStreamStateChanged(bool is_active,

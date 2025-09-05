@@ -245,6 +245,7 @@ class Reflector : public sigc::trackable
 
     Async::SslCertSigningReq loadClientPendingCsr(const std::string& callsign);
     Async::SslCertSigningReq loadClientCsr(const std::string& callsign);
+    bool renewedClientCert(Async::SslX509& cert);
     bool signClientCert(Async::SslX509& cert, const std::string& ca_op);
     Async::SslX509 signClientCsr(const std::string& cn);
     Async::SslX509 loadClientCertificate(const std::string& callsign);
@@ -256,6 +257,9 @@ class Reflector : public sigc::trackable
     std::string caBundlePem(void) const;
     std::string issuingCertPem(void) const;
     bool callsignOk(const std::string& callsign) const;
+    bool reqEmailOk(const Async::SslCertSigningReq& req) const;
+    bool emailOk(const std::string& email) const;
+    std::string checkCsr(const Async::SslCertSigningReq& req);
     Async::SslX509 csrReceived(Async::SslCertSigningReq& req);
 
   protected:
@@ -301,6 +305,7 @@ class Reflector : public sigc::trackable
     size_t                      m_ca_size = 0;
     std::vector<uint8_t>        m_ca_md;
     std::vector<uint8_t>        m_ca_sig;
+    std::string                 m_accept_cert_email;
 
       // contain user data
     struct User {

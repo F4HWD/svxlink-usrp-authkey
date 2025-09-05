@@ -15,10 +15,11 @@
 #             --build-arg=NUM_CORES_DEFAULT=<build with # cores>
 #
 # Run container with:
-#   podman run -it --rm --hostname ubuntu-build --userns=keep-id svxlink-ubuntu-build
+#   podman run -it --rm --hostname ubuntu-build svxlink-ubuntu-build
 #
 # For using sound inside the docker container add:
-#             --privileged -v /dev/snd:/dev/snd
+#             --userns=keep-id --group-add=keep-groups --user=$(id -u):$(id -g)
+#             --privileged --device /dev/snd
 #
 # To import your git config add:
 #             -v ${HOME}/.gitconfig:/home/svxlink/.gitconfig:ro
@@ -44,16 +45,41 @@
 #   svxlink
 
 ARG FROM=ubuntu:latest
+FROM ${FROM} AS downloader
 
+# Install packages needed to unpack the sound pack archives
+RUN apt -y update && \
+    apt -y install bzip2 bash
+
+# Add audio files
+ADD https://github.com/sm0svx/svxlink-sounds-en_US-heather/releases/download/24.02/svxlink-sounds-en_US-heather-16k-24.02.tar.bz2 /tmp/
+ADD https://github.com/sm0svx/svxlink-sounds-sv_SE-elin/releases/download/19.09.99.4/svxlink-sounds-sv_SE-elin-16k-19.09.99.4.tar.bz2 /tmp/
+RUN mkdir -p /sounds && \
+    cd /sounds && \
+    for tar in /tmp/*.tar.bz2; do \
+      tar xvaf "${tar}"; \
+    done && \
+    for lp in *; do \
+      ln -s "${lp}" "${lp%%-*}"; \
+    done
+
+
+###############################################################################
+
+ARG FROM=ubuntu:latest
 FROM ${FROM}
-MAINTAINER Tobias Blomberg <sm0svx@ssa.se>
+MAINTAINER Tobias Blomberg <sm0svx@svxlink.org>
+
+# Install audio files
+COPY --from=downloader /sounds /usr/share/svxlink/sounds
 
 # Install required packages and set up the svxlink user
 RUN apt-get update && \
     export DEBIAN_FRONTEND=noninteractive && \
     apt-get -y install git cmake g++ make libsigc++-2.0-dev libgsm1-dev \
                        libpopt-dev tcl8.6-dev libgcrypt20-dev libspeex-dev \
-                       libasound2-dev alsa-utils vorbis-tools libopus-dev \
+                       libasound2-dev alsa-utils vorbis-tools qtbase5-dev \
+                       qttools5-dev qttools5-dev-tools libopus-dev \
                        librtlsdr-dev libjsoncpp-dev libcurl4-openssl-dev \
                        libgpiod-dev libogg-dev ladspa-sdk curl sudo
 #RUN apt-get -y install groff doxygen
